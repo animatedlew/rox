@@ -1,0 +1,6 @@
+[package]
+name = "rox"
+version = "0.1.0"
+authors = ["Lewis Moronta <lewis.moronta@gmail.com>"]
+
+[dependencies]
