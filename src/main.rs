@@ -1,9 +1,27 @@
-use std::io;
 use std::env;
 use std::fs::File;
+use std::io;
 use std::io::prelude::*;
 use std::io::{BufRead, Write};
 use std::process;
+
+struct Token {
+    name: String,
+}
+
+struct Scanner {
+    source: String,
+}
+
+impl Scanner {
+    fn scan_tokens(&self) -> Vec<Token> {
+        self.source
+            .split(" ")
+            .map(|n| Token {
+                name: n.to_string(),
+            }).collect::<Vec<Token>>()
+    }
+}
 
 fn run_file(file_name: &String) {
     println!("source: {}", file_name);
@@ -31,8 +49,14 @@ fn run_prompt() {
     println!("done");
 }
 
-fn run(input: &String) {
-    println!("[{}]", input);
+fn run(source: &String) {
+    let scanner: Scanner = Scanner {
+        source: source.to_string()
+    };
+    let tokens: Vec<Token> = scanner.scan_tokens();
+    for token in tokens {
+        println!("{}", token.name);
+    }
 }
 
 fn main() {
