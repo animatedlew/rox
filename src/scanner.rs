@@ -1,63 +1,100 @@
-use global_state::GlobalState;
+use rox::Rox;
 use token::Token;
+use token_type::TokenType;
 
-use std::fs::File;
-use std::io;
-use std::io::{BufRead, Write};
-use std::io::prelude::*;
-use std::process;
-
+#[derive(Debug)]
 pub struct Scanner {
     source: String,
+    tokens: Vec<Token>,
+    start: usize,
+    current: usize,
+    line: usize,
 }
 
 impl Scanner {
-    fn scan_tokens(&self) -> Vec<Token> {
-        self.source
-            .split(" ")
-            .map(|n| Token::new(n.to_string())).collect::<Vec<Token>>()
-    }
-    pub fn run_file(file_name: &String, state: &mut GlobalState) {
-        println!("source: {}", file_name);
-        let mut f = File::open(file_name).expect("file not found");
-        let mut contents = String::new();
-        f.read_to_string(&mut contents)
-            .expect("could not parse file");
-        Scanner::run(&contents, state);
-        if state.had_error {
-            process::exit(65);
+    pub fn new(source: String) -> Scanner {
+        Scanner {
+            source: source,
+            tokens: Vec::new(),
+            start: 0,
+            current: 0,
+            line: 1,
         }
     }
-    pub fn run_prompt(state: &mut GlobalState) {
-        let mut line = String::new();
-        let stdin = io::stdin();
-        loop {
-            print!("> ");
-            io::stdout().flush().unwrap();
-            stdin.lock().read_line(&mut line).expect("syntax error");
-            if line.trim() == "exit" {
-                break;
+    pub fn scan_tokens(&mut self, rox: &mut Rox) {
+        while !self.is_at_end() {
+            self.start = self.current;
+            self.scan_token(rox); // uses Rox::error
+        }
+        self.add_token(TokenType::Eof);
+    }
+    fn is_at_end(&self) -> bool {
+        self.current >= self.get_source_chars().len()
+    }
+    pub fn print_tokens(&self) {
+        println!("tokens: {:?}", self.tokens);
+    }
+    fn scan_token(&mut self, rox: &mut Rox) {
+        match self.advance() {
+            '(' => self.add_token(TokenType::LeftParen),
+            ')' => self.add_token(TokenType::RightParen),
+            '{' => self.add_token(TokenType::LeftBrace),
+            '}' => self.add_token(TokenType::RightBrace),
+            ',' => self.add_token(TokenType::Comma),
+            '.' => self.add_token(TokenType::Dot),
+            '-' => self.add_token(TokenType::Minus),
+            '+' => self.add_token(TokenType::Plus),
+            ';' => self.add_token(TokenType::Semicolon),
+            '*' => self.add_token(TokenType::Star),
+            '!' => if self._match('=') {
+                self.add_token(TokenType::BangEqual)
             } else {
-                Scanner::run(&line.trim().to_string(), state);
-                line.clear();
-                state.had_error = false;
-            }
+                self.add_token(TokenType::Bang)
+            },
+            '=' => if self._match('=') {
+                self.add_token(TokenType::EqualEqual)
+            } else {
+                self.add_token(TokenType::Equal)
+            },
+            '<' => if self._match('=') {
+                self.add_token(TokenType::LessEqual)
+            } else {
+                self.add_token(TokenType::Less)
+            },
+            '>' => if self._match('=') {
+                self.add_token(TokenType::GreaterEqual)
+            } else {
+                self.add_token(TokenType::Greater)
+            },
+            c @ _ => Rox::error(self.line, format!("Unrecognized character: {}", c), rox),
         }
-        println!("done");
     }
-    fn run(source: &String, state: &mut GlobalState) {
-        let scanner: Scanner = Scanner { source: source.to_string() };
-        let tokens: Vec<Token> = scanner.scan_tokens();
-        for token in tokens {
-            println!("{:?}", token._type);
+    fn add_token(&mut self, _type: TokenType) {
+        self.tokens.push(Token {
+            _type: _type,
+            lexeme: None,
+            literal: None,
+            line: self.line,
+        });
+    }
+    fn advance(&mut self) -> char {
+        self.current = self.current + 1;
+        self.get_source_char(self.current - 1)
+    }
+    fn _match(&mut self, c: char) -> bool {
+        if self.is_at_end() {
+            return false;
         }
-        Scanner::error(2, "I can't believe it's not butter.".to_string(), state);
+        if self.get_source_chars()[self.current] != c {
+            return false;
+        }
+        self.current = self.current + 1;
+        true
     }
-    fn error(line: u32, message: String, state: &mut GlobalState) {
-        Scanner::report(line, "".to_string(), message, state);
+    fn get_source_char(&self, index: usize) -> char {
+        self.get_source_chars()[index]
     }
-    fn report(line: u32, _where: String, message: String, state: &mut GlobalState) {
-        println!("[line {}] Error {}: {}", line, _where, message);
-        state.had_error = true;
+    fn get_source_chars(&self) -> Vec<char> {
+        self.source.chars().collect()
     }
 }

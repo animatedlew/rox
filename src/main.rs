@@ -1,22 +1,21 @@
-mod token_type;
-mod token;
+mod rox;
 mod scanner;
-mod global_state;
+mod token;
+mod token_type;
 
+use rox::Rox;
 use std::env;
 use std::process;
-use scanner::Scanner;
-use global_state::GlobalState;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let mut state = GlobalState { had_error: true };
+    let mut rox = Rox { had_error: false };
     if args.len() > 2 {
         println!("Usage: rox [script]");
         process::exit(64);
     } else if args.len() == 2 {
-        Scanner::run_file(&args[1], &mut state);
+        rox.run_file(&args[1]);
     } else {
-        Scanner::run_prompt(&mut state);
+        rox.run_prompt();
     };
 }
