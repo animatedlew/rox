@@ -5,7 +5,7 @@ use std::io;
 use std::io::prelude::*;
 use std::io::{BufRead, Write};
 use std::process;
-use token_type::TokenType;
+use tokens::TokenType;
 
 #[derive(Debug)]
 pub struct Rox {

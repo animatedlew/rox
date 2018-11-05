@@ -1,11 +1,12 @@
+use literals::LiteralType;
 use std::fmt;
-use token_type::TokenType;
+use tokens::TokenType;
 
 #[derive(Debug)]
 pub struct Token {
     pub _type: TokenType,
     pub lexeme: Option<String>,
-    pub literal: Option<String>, // FIXME: set this to an enum that can accept several types
+    pub literal: LiteralType,
     pub line: usize,
 }
 

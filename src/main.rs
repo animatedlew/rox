@@ -1,7 +1,8 @@
+mod literals;
 mod rox;
 mod scanner;
 mod token;
-mod token_type;
+mod tokens;
 
 use rox::Rox;
 use std::env;
