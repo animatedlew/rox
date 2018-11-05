@@ -80,7 +80,55 @@ impl Scanner {
             }
             '\n' => self.line += 1,
             ' ' | '\r' | '\t' => {}
-            c @ _ => Rox::error(self.line, format!("Unrecognized character: {}", c), rox),
+            c @ _ => {
+                if self.is_digit(c) {
+                    self.number();
+                } else if self.is_alpha(c) {
+                    self.identifier(c);
+                } else {
+                    Rox::error(self.line, format!("Unrecognized character: {}", c), rox);
+                }
+            }
+        }
+    }
+    fn identifier(&mut self, c: char) {
+        let mut keyword = String::new();
+        keyword.push(c);
+        while self.is_alphanumeric(self.peek()) {
+            keyword.push(self.advance());
+        }
+        self.add_token(TokenType::Identifier, keyword.to_string());
+    }
+    fn is_alpha(&self, c: char) -> bool {
+        (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+    }
+    fn is_digit(&self, c: char) -> bool {
+        c >= '0' && c <= '9'
+    }
+    fn is_alphanumeric(&self, c: char) -> bool {
+        self.is_alpha(c) || self.is_digit(c)
+    }
+    fn number(&mut self) {
+        while self.is_digit(self.peek()) {
+            self.advance();
+        }
+        if self.peek() == '.' && self.is_digit(self.peek_next()) {
+            self.advance();
+            while self.is_digit(self.peek()) {
+                self.advance();
+            }
+        }
+        let n = self.parse_double(self.source[self.start..self.current].to_string());
+        self.add_token(TokenType::Number, n.to_string());
+    }
+    fn parse_double(&self, n: String) -> f64 {
+        n.parse().unwrap()
+    }
+    fn peek_next(&self) -> char {
+        if self.current + 1 >= self.get_source_chars().len() {
+            '\0'
+        } else {
+            self.get_source_char(self.current + 1)
         }
     }
     fn add_token(&mut self, _type: TokenType, literal: String) {
@@ -103,7 +151,7 @@ impl Scanner {
         } else {
             self.advance(); // The closing "
             let content = self.trim_quotes();
-            self.add_token(TokenType::String, content)
+            self.add_token(TokenType::String, content);
         }
     }
     fn trim_quotes(&self) -> String {

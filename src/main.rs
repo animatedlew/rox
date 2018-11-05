@@ -9,7 +9,7 @@ use std::process;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let mut rox = Rox { had_error: false };
+    let mut rox = Rox::new(false);
     if args.len() > 2 {
         println!("Usage: rox [script]");
         process::exit(64);

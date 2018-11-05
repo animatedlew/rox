@@ -5,7 +5,7 @@ use token_type::TokenType;
 pub struct Token {
     pub _type: TokenType,
     pub lexeme: Option<String>,
-    pub literal: Option<String>,
+    pub literal: Option<String>, // FIXME: set this to an enum that can accept several types
     pub line: usize,
 }
 
