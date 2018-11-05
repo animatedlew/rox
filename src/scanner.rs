@@ -84,20 +84,21 @@ impl Scanner {
                 if self.is_digit(c) {
                     self.number();
                 } else if self.is_alpha(c) {
-                    self.identifier(c);
+                    self.identifier(c, rox);
                 } else {
                     Rox::error(self.line, format!("Unrecognized character: {}", c), rox);
                 }
             }
         }
     }
-    fn identifier(&mut self, c: char) {
-        let mut keyword = String::new();
-        keyword.push(c);
+    fn identifier(&mut self, c: char, rox: &mut Rox) {
+        let mut id = String::new();
+        id.push(c);
         while self.is_alphanumeric(self.peek()) {
-            keyword.push(self.advance());
+            id.push(self.advance());
         }
-        self.add_token(TokenType::Identifier, keyword.to_string());
+        let _type = rox.keywords.get(&id).unwrap_or(&TokenType::Identifier);
+        self.add_token(*_type, id.to_string());
     }
     fn is_alpha(&self, c: char) -> bool {
         (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
