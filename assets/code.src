@@ -1,3 +1,7 @@
-!=
+!= // this is the end of the first line
 ==
-<=>=
+<=>= // this comment doesn't matter
+
+"this is a string"
+=!=
+// this is the last line
