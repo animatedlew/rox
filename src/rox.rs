@@ -10,28 +10,28 @@ use tokens::TokenType;
 #[derive(Debug)]
 pub struct Rox {
     pub had_error: bool,
-    pub keywords: HashMap<String, TokenType>,
+    pub keywords: HashMap<&'static str, TokenType>,
 }
 
 impl Rox {
     pub fn new(had_error: bool) -> Rox {
         let mut keywords = HashMap::new();
-        keywords.insert("and".to_string(), TokenType::And);
-        keywords.insert("or".to_string(), TokenType::Or);
-        keywords.insert("class".to_string(), TokenType::Class);
-        keywords.insert("if".to_string(), TokenType::If);
-        keywords.insert("else".to_string(), TokenType::Else);
-        keywords.insert("true".to_string(), TokenType::True);
-        keywords.insert("false".to_string(), TokenType::False);
-        keywords.insert("nil".to_string(), TokenType::Nil);
-        keywords.insert("for".to_string(), TokenType::For);
-        keywords.insert("fun".to_string(), TokenType::Fun);
-        keywords.insert("print".to_string(), TokenType::Print);
-        keywords.insert("return".to_string(), TokenType::Return);
-        keywords.insert("super".to_string(), TokenType::Super);
-        keywords.insert("this".to_string(), TokenType::This);
-        keywords.insert("var".to_string(), TokenType::Var);
-        keywords.insert("while".to_string(), TokenType::While);
+        keywords.insert("and", TokenType::And);
+        keywords.insert("or", TokenType::Or);
+        keywords.insert("class", TokenType::Class);
+        keywords.insert("if", TokenType::If);
+        keywords.insert("else", TokenType::Else);
+        keywords.insert("true", TokenType::True);
+        keywords.insert("false", TokenType::False);
+        keywords.insert("nil", TokenType::Nil);
+        keywords.insert("for", TokenType::For);
+        keywords.insert("fun", TokenType::Fun);
+        keywords.insert("print", TokenType::Print);
+        keywords.insert("return", TokenType::Return);
+        keywords.insert("super", TokenType::Super);
+        keywords.insert("this", TokenType::This);
+        keywords.insert("var", TokenType::Var);
+        keywords.insert("while", TokenType::While);
         Rox {
             had_error: had_error,
             keywords: keywords,

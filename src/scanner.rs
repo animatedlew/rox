@@ -101,7 +101,10 @@ impl Scanner {
         while self.is_alphanumeric(self.peek()) {
             id.push(self.advance());
         }
-        let _type = rox.keywords.get(&id).unwrap_or(&TokenType::Identifier);
+        let _type = rox
+            .keywords
+            .get(id.as_str())
+            .unwrap_or(&TokenType::Identifier);
         self.add_token(*_type, LiteralType::Custom(id));
     }
     fn is_alpha(&self, c: char) -> bool {
